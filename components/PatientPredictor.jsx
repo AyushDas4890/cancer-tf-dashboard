@@ -1,35 +1,93 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, UploadCloud, ChevronRight, Activity, Dna } from 'lucide-react';
+import { Play, UploadCloud, ChevronRight, Activity, Dna, Beaker, AlertTriangle } from 'lucide-react';
+import { predictFromSelected, getExampleSample, getAvailableExamples } from '@/lib/predict';
+
+const CANCER_COLORS = {
+  BRCA: '#f472b6',
+  COAD: '#fb923c',
+  KIRC: '#60a5fa',
+  LUAD: '#4ade80',
+  PRAD: '#FFD700',
+};
 
 export default function PatientPredictor() {
-  const [data, setData] = useState('');
+  const [selectedFeatures, setSelectedFeatures] = useState(null);
+  const [displayText, setDisplayText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+  const [loadedSample, setLoadedSample] = useState(null);
 
-  const handleLoadExample = () => {
-    setData('Loading Patient Sample #87 from TCGA cohort...\n\nGENE_0: 4.52\nGENE_1: -1.20\n...\n\nData loaded successfully. Ready for inference.');
+  const availableExamples = useMemo(() => getAvailableExamples(), []);
+
+  const handleLoadExample = (sampleName) => {
+    setResult(null);
+    setError(null);
+    const example = getExampleSample(sampleName);
+    if (!example) {
+      setError(`Sample ${sampleName} not found`);
+      return;
+    }
+    setSelectedFeatures(example.values);
+    setLoadedSample(sampleName);
+
+    // Show a summary in the textarea rather than 500 raw numbers
+    const preview = example.values.slice(0, 8).map(v => v.toFixed(4)).join(', ');
+    setDisplayText(
+      `✓ Loaded ${sampleName.replace('_', ' ').toUpperCase()} from TCGA cohort\n` +
+      `  Ground Truth Label: ${example.label}\n` +
+      `  Features: 500 pre-selected genes\n\n` +
+      `  Values (first 8): ${preview}, ...\n\n` +
+      `  Ready for inference. Click "Run ML Inference" below.`
+    );
   };
 
   const handlePredict = () => {
-    if (!data) return;
+    if (!selectedFeatures) return;
     setLoading(true);
-    // Mock inference
+    setError(null);
+
+    // Small delay so the UI spinner renders
     setTimeout(() => {
-      setResult({
-        cancerType: 'KIRC',
-        cancerName: 'Kidney Renal Clear Cell Carcinoma',
-        confidence: 98.76,
-        topTFs: [
-          { name: 'HNF1B', role: 'Kidney master regulator', level: '+4.2x' },
-          { name: 'PAX8', role: 'Kidney lineage TF', level: '+2.8x' },
-          { name: 'TCF20', role: 'Co-activator', level: '+1.5x' }
-        ]
-      });
+      try {
+        const prediction = predictFromSelected(selectedFeatures);
+        setResult(prediction);
+      } catch (e) {
+        setError(e.message);
+      }
       setLoading(false);
-    }, 1500);
+    }, 400);
+  };
+
+  const handlePasteRaw = (e) => {
+    const text = e.target.value;
+    setDisplayText(text);
+    setResult(null);
+    setError(null);
+    setLoadedSample(null);
+
+    // Try parsing as 500 comma/tab/newline separated numbers
+    const nums = text
+      .split(/[\t,\n\r\s]+/)
+      .map(v => v.trim())
+      .filter(v => v.length > 0 && !isNaN(Number(v)))
+      .map(Number);
+
+    if (nums.length === 500) {
+      setSelectedFeatures(nums);
+    } else if (nums.length >= 20531) {
+      // Extract the 500 selected features from full raw
+      const { MODEL_DATA } = require('@/lib/modelData');
+      const extracted = MODEL_DATA.selected_gene_raw_indices.map(idx => nums[idx]);
+      setSelectedFeatures(extracted);
+    } else if (nums.length > 0) {
+      setSelectedFeatures(null); // invalid count
+    } else {
+      setSelectedFeatures(null);
+    }
   };
 
   return (
@@ -48,34 +106,58 @@ export default function PatientPredictor() {
             </div>
             <div>
               <h3 className="text-xl font-bold font-mono">Patient RNA-Seq Input</h3>
-              <p className="text-xs text-gray-400">Input raw expression profile for inference</p>
+              <p className="text-xs text-gray-400">Load a sample or paste 500 gene expression values</p>
             </div>
           </div>
 
           <div className="flex-1 flex flex-col relative">
             <textarea 
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-              placeholder="Paste raw RNA-Seq data or upload a file..."
+              value={displayText}
+              onChange={handlePasteRaw}
+              placeholder="Paste 500 pre-selected gene expression values (comma or newline separated)&#10;&#10;Or load an example sample using the buttons below..."
               className="flex-1 min-h-[200px] bg-[#020813]/60 border border-[#3b82f6]/20 rounded-xl p-4 text-xs font-mono text-gray-300 focus:outline-none focus:border-[#FFD700]/50 transition-colors resize-none"
             />
             
-            <div className="absolute bottom-4 right-4 flex gap-2">
-              <button 
-                onClick={handleLoadExample}
-                className="px-4 py-2 bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 border border-[#3b82f6]/30 rounded-lg text-xs font-mono text-[#60a5fa] transition-colors flex items-center gap-2"
-              >
-                <UploadCloud className="w-4 h-4" />
-                Sample #87
-              </button>
+            <div className="absolute bottom-4 right-4 flex gap-2 flex-wrap justify-end">
+              {availableExamples.map((sampleName) => {
+                const example = getExampleSample(sampleName);
+                const sampleNum = sampleName.replace('sample_', '#');
+                const isActive = loadedSample === sampleName;
+                return (
+                  <button 
+                    key={sampleName}
+                    onClick={() => handleLoadExample(sampleName)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
+                      isActive 
+                        ? 'bg-[#FFD700]/20 border border-[#FFD700]/50 text-[#FFD700]' 
+                        : 'bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 border border-[#3b82f6]/30 text-[#60a5fa]'
+                    }`}
+                    title={`Load ${sampleName} (${example?.label})`}
+                  >
+                    <Beaker className="w-3 h-3" />
+                    {sampleNum}
+                    <span className="opacity-60 text-[10px]">({example?.label})</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+              className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 font-mono flex items-center gap-2"
+            >
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </motion.div>
+          )}
+
           <button 
             onClick={handlePredict}
-            disabled={!data || loading}
+            disabled={!selectedFeatures || loading}
             className={`mt-4 w-full py-4 rounded-xl font-bold font-mono text-sm transition-all flex items-center justify-center gap-2 ${
-              !data || loading 
+              !selectedFeatures || loading 
               ? 'bg-[#0a1526] text-gray-500 cursor-not-allowed border border-white/5'
               : 'bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:to-[#1d4ed8] text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]'
             }`}
@@ -83,7 +165,7 @@ export default function PatientPredictor() {
             {loading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Processing...
+                Running 100 Decision Trees...
               </>
             ) : (
               <>
@@ -109,6 +191,9 @@ export default function PatientPredictor() {
                 <p className="text-gray-400 font-mono text-sm">
                   Awaiting patient profile.<br />Run inference to discover active TF drivers.
                 </p>
+                <p className="text-gray-600 font-mono text-[10px] mt-3">
+                  100 Decision Trees · 500 Genes · 5 Cancer Types
+                </p>
               </motion.div>
             ) : (
               <motion.div
@@ -125,9 +210,35 @@ export default function PatientPredictor() {
                   </div>
                   <h4 className="text-xs font-mono tracking-widest text-[#60a5fa] mb-1 uppercase">Predicted Subtype</h4>
                   <div className="flex items-end gap-3 mb-2">
-                    <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">{result.cancerType}</span>
+                    <span 
+                      className="text-4xl font-black"
+                      style={{ color: CANCER_COLORS[result.cancerType] || '#fff' }}
+                    >
+                      {result.cancerType}
+                    </span>
                   </div>
                   <p className="text-sm text-gray-400">{result.cancerName}</p>
+
+                  {/* Probability bar chart */}
+                  <div className="mt-4 space-y-2">
+                    {Object.entries(result.probabilities)
+                      .sort((a, b) => b[1] - a[1])
+                      .map(([cls, prob]) => (
+                        <div key={cls} className="flex items-center gap-3">
+                          <span className="text-[10px] font-mono text-gray-500 w-10">{cls}</span>
+                          <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${prob}%` }}
+                              transition={{ duration: 0.8, ease: 'easeOut' }}
+                              className="h-full rounded-full"
+                              style={{ backgroundColor: CANCER_COLORS[cls] || '#3b82f6' }}
+                            />
+                          </div>
+                          <span className="text-[10px] font-mono text-gray-500 w-12 text-right">{prob}%</span>
+                        </div>
+                      ))}
+                  </div>
                 </div>
 
                 <div>
@@ -160,6 +271,24 @@ export default function PatientPredictor() {
                     ))}
                   </div>
                 </div>
+
+                {loadedSample && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-center"
+                  >
+                    <p className="text-[10px] font-mono text-gray-600">
+                      Ground truth: <span className="text-[#FFD700]">{getExampleSample(loadedSample)?.label}</span>
+                      {' · '}
+                      Predicted: <span className={result.cancerType === getExampleSample(loadedSample)?.label ? 'text-green-400' : 'text-red-400'}>
+                        {result.cancerType}
+                      </span>
+                      {' · '}
+                      {result.cancerType === getExampleSample(loadedSample)?.label ? '✓ Correct' : '✗ Mismatch'}
+                    </p>
+                  </motion.div>
+                )}
                 
               </motion.div>
             )}
