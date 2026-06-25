@@ -62,14 +62,14 @@ export default function PatientPredictor() {
     }, 400);
   };
 
-  const handlePasteRaw = (e) => {
+  const handlePasteRaw = async (e) => {
     const text = e.target.value;
     setDisplayText(text);
     setResult(null);
     setError(null);
     setLoadedSample(null);
 
-    // Try parsing as 500 comma/tab/newline separated numbers
+    // Try parsing as comma/tab/newline separated numbers
     const nums = text
       .split(/[\t,\n\r\s]+/)
       .map(v => v.trim())
@@ -80,10 +80,17 @@ export default function PatientPredictor() {
       setSelectedFeatures(nums);
     } else if (nums.length >= 20531) {
       // Extract the 500 selected features from full raw
-      const { MODEL_DATA } = require('@/lib/modelData');
-      const extracted = MODEL_DATA.selected_gene_raw_indices.map(idx => nums[idx]);
-      setSelectedFeatures(extracted);
+      try {
+        const { MODEL_DATA } = await import('@/lib/modelData');
+        const extracted = MODEL_DATA.selected_gene_raw_indices.map(idx => nums[idx]);
+        setSelectedFeatures(extracted);
+      } catch (err) {
+        console.error("Failed to load model data for extraction", err);
+        setError("Failed to process the raw dataset row.");
+        setSelectedFeatures(null);
+      }
     } else if (nums.length > 0) {
+      setError(`Invalid data format. Expected 500 pre-selected features or full 20531 features, but got ${nums.length} values.`);
       setSelectedFeatures(null); // invalid count
     } else {
       setSelectedFeatures(null);
