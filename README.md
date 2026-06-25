@@ -5,7 +5,7 @@
 
   **Predicting cancer cell growth type and discovering key Transcription Factors (TFs) from RNA-Seq gene expression.**
 
-  [![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-Explore_Now-FFD700?style=for-the-badge&logo=vercel&logoColor=black)](#)
+  [![Live Dashboard](https://img.shields.io/badge/Live_Dashboard-Explore_Now-FFD700?style=for-the-badge&logo=vercel&logoColor=black)](https://cancer-tf-dashboard.vercel.app)
   [![Dataset](https://img.shields.io/badge/UCI_Dataset-401-0A2540?style=for-the-badge)](https://archive.ics.uci.edu/dataset/401/gene+expression+cancer+rna+seq)
   [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
   [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
