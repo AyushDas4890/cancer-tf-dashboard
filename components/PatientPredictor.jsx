@@ -20,12 +20,14 @@ export default function PatientPredictor() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [loadedSample, setLoadedSample] = useState(null);
+  const [warning, setWarning] = useState(null);
 
   const availableExamples = useMemo(() => getAvailableExamples(), []);
 
   const handleLoadExample = (sampleName) => {
     setResult(null);
     setError(null);
+    setWarning(null);
     const example = getExampleSample(sampleName);
     if (!example) {
       setError(`Sample ${sampleName} not found`);
@@ -67,6 +69,7 @@ export default function PatientPredictor() {
     setDisplayText(text);
     setResult(null);
     setError(null);
+    setWarning(null);
     setLoadedSample(null);
 
     // Try parsing as comma/tab/newline separated numbers
@@ -78,12 +81,15 @@ export default function PatientPredictor() {
 
     if (nums.length === 500) {
       setSelectedFeatures(nums);
-    } else if (nums.length >= 20531) {
+    } else if (nums.length >= 20531 || nums.length === 16383 || nums.length === 16384) {
       // Extract the 500 selected features from full raw
       try {
         const { MODEL_DATA } = await import('@/lib/modelData');
         const extracted = MODEL_DATA.selected_gene_raw_indices.map(idx => nums[idx]);
         setSelectedFeatures(extracted);
+        if (nums.length < 20531) {
+          setWarning(`Excel truncation detected! You pasted ${nums.length} values. Excel maxes out at 16,384 columns, so ~4,000 genes were dropped. The model will automatically impute the missing 76 required features with median values.`);
+        }
       } catch (err) {
         console.error("Failed to load model data for extraction", err);
         setError("Failed to process the raw dataset row.");
@@ -157,6 +163,16 @@ export default function PatientPredictor() {
             >
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
               {error}
+            </motion.div>
+          )}
+
+          {warning && (
+            <motion.div 
+              initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+              className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-xs text-yellow-500 font-mono flex items-start gap-2"
+            >
+              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <div className="leading-relaxed">{warning}</div>
             </motion.div>
           )}
 
