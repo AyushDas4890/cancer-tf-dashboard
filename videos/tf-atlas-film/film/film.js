@@ -101,12 +101,12 @@
   };
   const LOOP_FROM = 38.6;
   function view(t) {
-    const cam = C.trkObj(t, [[0, POSE.hook], ['data', POSE.data, GLIDE], ['clusters', POSE.clusters, GLIDE], ['end', POSE.end, 'default']]);
+    const cam = C.trkObj(t, [[0, POSE.hook], ['data', POSE.data, GLIDE], ['clusters', POSE.clusters, GLIDE], [34, POSE.end, 'default']]);
     let M = ease.inOut(seg(t, 8.25, 10.75)) + ease.inOut(seg(t, 'model', 17.5)) + ease.out(seg(t, 23.85, 25.25));
     if (C.beatAt(t) >= 33) M = 0;                                       // swapped while the field is invisible (UI shot)
     // face-on offsets: the matrix and the clusters read flat-on while the orbit keeps turning
     const A = trk(t, [[0, 0], ['data', 1.1, GLIDE], [19, -1.36, SLOW], [33, 0, SLOW]]);
-    let alpha = trk(t, [[0, 1], ['model', 0.75, 'default'], [23.5, 1, 'default'], [31.4, 0, { response: 0.6, damping: 1 }], [36.2, 0.35, GLIDE]]);
+    let alpha = trk(t, [[0, 1], ['model', 0.75, 'default'], [23.5, 1, 'default'], [31.4, 0, { response: 0.6, damping: 1 }], [35.3, 0.35, GLIDE]]);
     let s = cam.s * (1 + 0.8 * ease.expoIn(seg(t, 31.25, 32.25)) * (C.beatAt(t) < 33 ? 1 : 0));   // clusters pushed past camera
     const k = ease.inOut(seg(t, LOOP_FROM, 'done'));                     // close on the frame the film opens on
     return {
@@ -277,7 +277,7 @@
     run(t, b, S) {
       S.L.forEach((L, i) => rise(t, L, 32 + i * 0.5, 35.5, { stagger: 0.06 }));
       // card rises over the dissolving field, lifts away before the lockup lands (no cut either side)
-      const up = spHit(t, 'ui', 'default'), away = sp(t, 35.55, 'default');
+      const up = spHit(t, 'ui', 'default'), away = sp(t, 35.7, 'default');
       const clicked = b >= beatOf('ui_click');
       const hgt = trk(t, [['ui', PRE.h], ['ui_click', POST.h, 'default']]) * S.u;
       put(S.card, { o: up > 0.002 && away < 0.995 ? 1 : 0, y: lerp(H * 0.5, 0, up) - H * 0.9 * away, s: 1 - 0.06 * away, r: -2.5 * (1 - up), css: { height: hgt + 'px' } });

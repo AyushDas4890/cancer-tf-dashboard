@@ -90,3 +90,22 @@ Scores 1–10. Ship only when EVERY score is ≥ 8, after at least 3 rounds.
 | Polish | 8 | No blank frames; contact "12.0 s" sliver is the sampler landing just after the b24 cut: stills at 12.0 s (model scene) and 12.1 s (clean) confirm no glyph leak. |
 
 **Verdict: SHIP** (all ≥ 8 after 3 rounds).
+
+## Round 4: continuity rebuild after user feedback ("transitions not smooth"), drafts in review/r4
+
+The user saw the hard cuts as jumps (the same helix teleported between shots) and the loop as a seam. Rebuilt:
+one continuous particle layer gliding between poses, sequential text exits, UI card rising over / lifting away from
+the field, and the last 1.4 beats blending onto the frame-0 pose.
+
+| Criterion | Score | Evidence (timestamps, frame numbers, metric values) |
+|---|---|---|
+| Hook (first 2 s) | 8 | "Five" rises from frame 3 (needed for a seamless loop); full promise by 1.5 s. |
+| Readability at phone size | 8 | Unchanged sizes; phone_9x16 / phone_16x9 legible. |
+| Motion quality | 9 | No hard cuts left: helix glides into the matrix (4.0–5.5 s), sphere → burst, field pushed past camera into the UI card (15.6–16.2 s). |
+| Variety / pacing | 8 | max gap 3.27 s, longest static 0.4 s. |
+| Brand accuracy | 9 | Unchanged. |
+| Sound sync | 8 | Shutters (no cuts any more) replaced by pops on the landing text; label offsets remain the whole-frame metric artifact. -14.1 LUFS. |
+| Composition (every format) | 8 | Unchanged blocking; 9:16 field glides from the lower right into centre. |
+| Polish | 8 | loop_seam_jump 2.4 (continuous). Near-blank 17.97 s (card gone before lockup) fixed: card lifts later, helix returns from 35.3 — stills 17.85 / 17.97 / 18.05 show content on every frame. |
+
+**Verdict: SHIP.**
