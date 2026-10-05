@@ -101,7 +101,7 @@ function Field({ pointer }) {
   const reduce = useReducedMotion();
   const { viewport, size, gl } = useThree();
   const geometry = useMemo(buildShapes, []);
-  const uniforms = useMemo(() => ({ uMorph: { value: 0 }, uTime: { value: 0 }, uScale: { value: 60 }, uFade: { value: 1 } }), []);
+  const uniforms = useMemo(() => ({ uMorph: { value: 0 }, uTime: { value: 0 }, uScale: { value: 60 }, uFade: { value: sceneState.fade } }), []);
   const base = useRef(0);
 
   useFrame((_, dt) => {

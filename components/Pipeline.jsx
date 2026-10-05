@@ -35,7 +35,7 @@ export default function Pipeline() {
           .to(ticks[i], { color: '#F2C14E', duration: 0.1 }, at + 0.15);
       });
       // Dim the particle field once the story is told so content below stays legible.
-      gsap.fromTo(sceneState, { fade: 1 }, { fade: 0.16, ease: 'none', scrollTrigger: { trigger: document.getElementById('results'), start: 'top bottom', end: 'top 35%', scrub: true } });
+      gsap.fromTo(sceneState, { fade: 1 }, { fade: 0.16, ease: 'none', immediateRender: false, scrollTrigger: { trigger: document.getElementById('results'), start: 'top bottom', end: 'top 35%', scrub: true } });
     });
     return () => { mm.revert(); sceneState.morph = 0; sceneState.fade = 1; };
   }, []);

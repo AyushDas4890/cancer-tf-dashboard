@@ -6,8 +6,8 @@ import { gsap, SplitText } from '@/lib/gsap';
 import { sceneState } from '@/lib/sceneState';
 
 const FILM = {
-  wide: { src: '/film/atlas-film.mp4', poster: '/film/poster.jpg' },
-  tall: { src: '/film/atlas-film-9x16.mp4', poster: '/film/poster-9x16.jpg' },
+  wide: { name: 'atlas-film', poster: '/film/poster.jpg' },
+  tall: { name: 'atlas-film-9x16', poster: '/film/poster-9x16.jpg' },
 };
 
 // The film is the hero: full-bleed, autoplaying muted, feathered into the page, and it dissolves into the
@@ -39,8 +39,12 @@ function FilmHero() {
 
   useEffect(() => {
     const mm = gsap.matchMedia(root.current);
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.to('.film-layer', { scale: 1.08, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true } });
+    mm.add({ full: '(prefers-reduced-motion: no-preference)', reduce: '(prefers-reduced-motion: reduce)' }, ({ conditions }) => {
+      // Hand-off: the film dissolves within the first ~half screen of scroll while the live helix fades in behind it
+      const scrollTrigger = { trigger: root.current, start: 'top top', end: () => `+=${innerHeight * 0.5}`, scrub: true, invalidateOnRefresh: true };
+      gsap.fromTo(sceneState, { fade: 0 }, { fade: 1, ease: 'none', scrollTrigger });
+      if (conditions.full) gsap.to('.film-layer', { scale: 1.06, autoAlpha: 0, ease: 'none', scrollTrigger });
+      gsap.to('.film-ui', { autoAlpha: 0, ease: 'none', scrollTrigger: { ...scrollTrigger, end: () => `+=${innerHeight * 0.2}` } });
     });
     return () => mm.revert();
   }, []);
@@ -56,16 +60,15 @@ function FilmHero() {
 
   return (
     <section id="top" ref={root} className="relative z-10 h-[100svh] overflow-hidden" aria-label="Cancer TF Atlas film">
-      <div className="film-layer absolute inset-0 [mask-image:linear-gradient(to_bottom,black_62%,transparent),radial-gradient(130%_100%_at_50%_40%,black_60%,transparent)] [mask-composite:intersect] [-webkit-mask-composite:source-in]">
+      <div className="film-layer absolute inset-0 [mask-image:linear-gradient(to_bottom,black_80%,transparent),radial-gradient(160%_125%_at_50%_45%,black_62%,transparent)] [mask-composite:intersect] [-webkit-mask-composite:source-in]">
         {film && (
-          <video
-            key={film.src} ref={video} src={film.src} poster={film.poster}
-            muted loop playsInline preload="auto" aria-hidden
-            className="h-full w-full object-cover"
-          />
+          <video key={film.name} ref={video} poster={film.poster} muted loop playsInline preload="auto" aria-hidden className="h-full w-full object-cover">
+            <source src={`/film/${film.name}.mp4`} type="video/mp4" />
+            <source src={`/film/${film.name}.webm`} type="video/webm" />
+          </video>
         )}
       </div>
-      <div className="absolute bottom-6 right-5 z-10 flex gap-2 md:bottom-10 md:right-10">
+      <div className="film-ui absolute bottom-6 right-5 z-10 flex gap-2 md:bottom-10 md:right-10">
         {paused ? (
           <button onClick={() => { setMuted(false); setNeedsTap(false); }} className="btn-accent !py-2.5">
             <Play className="h-4 w-4" fill="currentColor" /> Play film
@@ -77,7 +80,7 @@ function FilmHero() {
           </button>
         )}
       </div>
-      <a href="#intro" className="absolute bottom-6 left-5 z-10 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-fg-3 transition-colors hover:text-fg md:bottom-10 md:left-10">
+      <a href="#intro" className="film-ui absolute bottom-6 left-5 z-10 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.18em] text-fg-3 transition-colors hover:text-fg md:bottom-10 md:left-10">
         Scroll <ArrowDown className="h-3.5 w-3.5" />
       </a>
     </section>
