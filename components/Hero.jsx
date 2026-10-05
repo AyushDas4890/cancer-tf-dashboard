@@ -40,11 +40,12 @@ function FilmHero() {
   useEffect(() => {
     const mm = gsap.matchMedia(root.current);
     mm.add({ full: '(prefers-reduced-motion: no-preference)', reduce: '(prefers-reduced-motion: reduce)' }, ({ conditions }) => {
-      // Hand-off: the film dissolves within the first ~half screen of scroll while the live helix fades in behind it
-      const scrollTrigger = { trigger: root.current, start: 'top top', end: () => `+=${innerHeight * 0.5}`, scrub: true, invalidateOnRefresh: true };
-      gsap.fromTo(sceneState, { fade: 0 }, { fade: 1, ease: 'none', scrollTrigger });
-      if (conditions.full) gsap.to('.film-layer', { scale: 1.06, autoAlpha: 0, ease: 'none', scrollTrigger });
-      gsap.to('.film-ui', { autoAlpha: 0, ease: 'none', scrollTrigger: { ...scrollTrigger, end: () => `+=${innerHeight * 0.2}` } });
+      // Sequential hand-off (no ghosting between the film's helix and the live one): the film clears in the first
+      // third of a screen of scroll, then the live particle helix fades in behind the intro.
+      const st = (start, end) => ({ trigger: root.current, start, end, scrub: 0.6 });
+      gsap.fromTo(sceneState, { fade: 0 }, { fade: 1, ease: 'none', scrollTrigger: st('top -25%', 'top -60%') });
+      if (conditions.full) gsap.to('.film-layer', { scale: 1.04, autoAlpha: 0, ease: 'none', scrollTrigger: st('top top', 'top -35%') });
+      gsap.to('.film-ui', { autoAlpha: 0, ease: 'none', scrollTrigger: st('top top', 'top -15%') });
     });
     return () => mm.revert();
   }, []);
@@ -59,10 +60,12 @@ function FilmHero() {
   const paused = needsTap || (reduce && muted);
 
   return (
-    <section id="top" ref={root} className="relative z-10 h-[100svh] overflow-hidden" aria-label="Cancer TF Atlas film">
-      <div className="film-layer absolute inset-0 [mask-image:linear-gradient(to_bottom,black_80%,transparent),radial-gradient(160%_125%_at_50%_45%,black_62%,transparent)] [mask-composite:intersect] [-webkit-mask-composite:source-in]">
+    <section id="top" ref={root} className="relative z-10 grid h-[100svh] place-items-center overflow-hidden" aria-label="Cancer TF Atlas film">
+      {/* Whole frame, never cropped: the film's background is the page colour, so the letterbox is invisible and
+          only the outer few percent is feathered to hide the encode's edge. */}
+      <div className={`film-layer relative ${tall ? 'aspect-[9/16] w-[min(100vw,calc(100svh*9/16))]' : 'aspect-video w-[min(100vw,calc(100svh*16/9))]'} [mask-composite:intersect] [-webkit-mask-composite:source-in] [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent),linear-gradient(to_bottom,transparent,black_4%,black_94%,transparent)]`}>
         {film && (
-          <video key={film.name} ref={video} poster={film.poster} muted loop playsInline preload="auto" aria-hidden className="h-full w-full object-cover">
+          <video key={film.name} ref={video} poster={film.poster} muted loop playsInline preload="auto" aria-hidden className="absolute inset-0 h-full w-full">
             <source src={`/film/${film.name}.mp4`} type="video/mp4" />
             <source src={`/film/${film.name}.webm`} type="video/webm" />
           </video>

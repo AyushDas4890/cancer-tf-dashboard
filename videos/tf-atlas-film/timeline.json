@@ -106,9 +106,9 @@
     },
     {
       "at": "data",
-      "type": "shutter",
-      "gain": 0.55,
-      "what": "hard cut into the data shot"
+      "type": "pop",
+      "gain": 0.5,
+      "what": "'20,531 genes.' lands as the helix glides into the matrix"
     },
     {
       "at": 8.5,
@@ -126,9 +126,9 @@
     },
     {
       "at": "model",
-      "type": "shutter",
+      "type": "pop",
       "gain": 0.5,
-      "what": "hard cut into the model shot"
+      "what": "'100 trees vote.' lands as the sphere forms"
     },
     {
       "at": "acc",
@@ -201,6 +201,12 @@
       "type": "pop",
       "gain": 0.6,
       "what": "CTA"
+    },
+    {
+      "at": 35.75,
+      "type": "whoosh",
+      "gain": 0.5,
+      "what": "predictor card lifts away"
     }
   ]
 }

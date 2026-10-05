@@ -41,15 +41,15 @@
   },
   {
    "t": 4.00015,
-   "type": "shutter",
-   "gain": 0.55,
+   "type": "pop",
+   "gain": 0.5,
    "pitch": 1.022,
    "pan": 0.151,
    "beat": 8,
    "mark": "data",
    "snapped_to_hit": true,
    "snap_ms": 0,
-   "what": "hard cut into the data shot"
+   "what": "'20,531 genes.' lands as the helix glides into the matrix"
   },
   {
    "t": 4.24523,
@@ -161,7 +161,7 @@
   },
   {
    "t": 8.00013,
-   "type": "shutter",
+   "type": "pop",
    "gain": 0.5,
    "pitch": 0.973,
    "pan": -0.113,
@@ -169,7 +169,7 @@
    "mark": "model",
    "snapped_to_hit": true,
    "snap_ms": 0,
-   "what": "hard cut into the model shot"
+   "what": "'100 trees vote.' lands as the sphere forms"
   },
   {
    "t": 10.00015,
@@ -290,6 +290,18 @@
    "snapped_to_hit": true,
    "snap_ms": 0,
    "what": "Run ML inference pressed"
+  },
+  {
+   "t": 17.8751,
+   "type": "whoosh",
+   "gain": 0.5,
+   "pitch": 1.057,
+   "pan": 0.05,
+   "beat": 35.75,
+   "mark": null,
+   "snapped_to_hit": false,
+   "snap_ms": 0,
+   "what": "predictor card lifts away"
   },
   {
    "t": 18.0001,
