@@ -1,0 +1,15 @@
+# Regenerable outputs: re-create with the commands in ../README.md
+renders/
+review/
+audio/
+assets/site/
+assets/brand/
+assets/cap/*.png
+!assets/cap/predictor_pre.png
+!assets/cap/predictor_post.png
+assets/fonts/*
+!assets/fonts/display.woff2
+!assets/fonts/ui.woff2
+!assets/fonts/README.md
+node_modules
+.owner

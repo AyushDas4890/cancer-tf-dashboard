@@ -1,0 +1,212 @@
+{
+  "note": "Single source of truth for picture + sound, in BEATS on the measured grid.",
+  "title": "Cancer TF Atlas \u2014 hero film",
+  "duration": 20,
+  "fps": 60,
+  "bpm": 120,
+  "formats": [
+    "16x9",
+    "9x16"
+  ],
+  "music": {
+    "source": "synth",
+    "chords": [
+      "Dm",
+      "Bb",
+      "F",
+      "C"
+    ],
+    "seed": 4890,
+    "sections": [
+      {
+        "at": "hook",
+        "kind": "intro"
+      },
+      {
+        "at": "data",
+        "kind": "full"
+      },
+      {
+        "at": "model",
+        "kind": "build"
+      },
+      {
+        "at": "gap",
+        "kind": "gap"
+      },
+      {
+        "at": "clusters",
+        "kind": "drop"
+      },
+      {
+        "at": "ui",
+        "kind": "full"
+      },
+      {
+        "at": "end",
+        "kind": "outro"
+      }
+    ],
+    "accents": [
+      "end"
+    ]
+  },
+  "voiceover": null,
+  "marks": {
+    "hook": 0,
+    "hook_w2": 1,
+    "hook_w3": 2,
+    "hook_w4": 2.5,
+    "hook_w5": 3,
+    "eyebrow": 4,
+    "data": 8,
+    "count_end": 10.5,
+    "select": 12,
+    "select_lit": 13,
+    "model": 16,
+    "tree_end": 19,
+    "acc": 20,
+    "acc_land": 21,
+    "gap": 23.5,
+    "clusters": 24,
+    "c1": 25,
+    "c2": 25.5,
+    "c3": 26,
+    "c4": 26.5,
+    "c5": 27,
+    "tf1": 28,
+    "tf2": 28.5,
+    "tf3": 29,
+    "tf4": 29.5,
+    "tf5": 30,
+    "ui": 32,
+    "ui_click": 34,
+    "end": 36,
+    "cta": 37,
+    "done": 40
+  },
+  "sfx": [
+    {
+      "at": "hook_w2",
+      "type": "pop",
+      "gain": 0.55,
+      "what": "'cancers.' lands"
+    },
+    {
+      "at": "hook_w3",
+      "type": "pop",
+      "gain": 0.6,
+      "what": "'Nineteen' lands"
+    },
+    {
+      "at": "hook_w5",
+      "type": "pop",
+      "gain": 0.7,
+      "what": "'switches.' lands"
+    },
+    {
+      "at": "data",
+      "type": "pop",
+      "gain": 0.5,
+      "what": "'20,531 genes.' lands as the helix glides into the matrix"
+    },
+    {
+      "at": 8.5,
+      "to": 10.5,
+      "every": 0.25,
+      "type": "tick",
+      "gain": 0.3,
+      "what": "gene counter ticks"
+    },
+    {
+      "at": "select",
+      "type": "whoosh",
+      "gain": 0.6,
+      "what": "matrix collapses to 500 genes"
+    },
+    {
+      "at": "model",
+      "type": "pop",
+      "gain": 0.5,
+      "what": "'100 trees vote.' lands as the sphere forms"
+    },
+    {
+      "at": "acc",
+      "type": "pop",
+      "gain": 0.7,
+      "what": "98.76% lands"
+    },
+    {
+      "at": "gap",
+      "type": "riser",
+      "gain": 0.5,
+      "what": "riser into the cluster drop"
+    },
+    {
+      "at": "clusters",
+      "type": "thump",
+      "gain": 0.85,
+      "what": "particles burst into five clusters"
+    },
+    {
+      "at": "c1",
+      "type": "pop",
+      "gain": 0.45,
+      "what": "BRCA label"
+    },
+    {
+      "at": "c2",
+      "type": "pop",
+      "gain": 0.45,
+      "what": "KIRC label"
+    },
+    {
+      "at": "c3",
+      "type": "pop",
+      "gain": 0.45,
+      "what": "LUAD label"
+    },
+    {
+      "at": "c4",
+      "type": "pop",
+      "gain": 0.45,
+      "what": "PRAD label"
+    },
+    {
+      "at": "c5",
+      "type": "pop",
+      "gain": 0.45,
+      "what": "COAD label"
+    },
+    {
+      "at": "ui",
+      "type": "whoosh",
+      "gain": 0.6,
+      "what": "real predictor UI card rises"
+    },
+    {
+      "at": "ui_click",
+      "type": "click",
+      "gain": 0.75,
+      "what": "Run ML inference pressed"
+    },
+    {
+      "at": "end",
+      "type": "thump",
+      "gain": 0.9,
+      "what": "logo lockup lands"
+    },
+    {
+      "at": "cta",
+      "type": "pop",
+      "gain": 0.6,
+      "what": "CTA"
+    },
+    {
+      "at": 35.75,
+      "type": "whoosh",
+      "gain": 0.5,
+      "what": "predictor card lifts away"
+    }
+  ]
+}

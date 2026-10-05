@@ -1,17 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, UploadCloud, ChevronRight, Activity, Dna, Beaker, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Play, Dna, Beaker, AlertTriangle } from 'lucide-react';
 import { predictFromSelected, getExampleSample, getAvailableExamples } from '@/lib/predict';
-
-const CANCER_COLORS = {
-  BRCA: '#f472b6',
-  COAD: '#fb923c',
-  KIRC: '#60a5fa',
-  LUAD: '#4ade80',
-  PRAD: '#FFD700',
-};
+import { CANCER_COLORS } from '@/lib/data';
 
 export default function PatientPredictor() {
   const [selectedFeatures, setSelectedFeatures] = useState(null);
@@ -103,221 +96,118 @@ export default function PatientPredictor() {
     }
   };
 
+  const truth = loadedSample && getExampleSample(loadedSample)?.label;
+  const alert = 'mt-3 flex items-start gap-2 rounded-xl border p-3 font-mono text-xs leading-relaxed';
+
   return (
-    <div className="w-full glass rounded-2xl p-8 relative overflow-hidden group">
-      {/* Background decoration */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#3b82f6] rounded-full blur-[100px] opacity-20 group-hover:opacity-30 transition-opacity duration-700" />
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#FFD700] rounded-full blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-700" />
-      
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12">
-        
-        {/* Left Side: Input */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#3b82f6]/20 flex items-center justify-center border border-[#3b82f6]/30">
-              <Activity className="w-5 h-5 text-[#3b82f6]" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold font-mono">Patient RNA-Seq Input</h3>
-              <p className="text-xs text-gray-400">Load a sample or paste 500 gene expression values</p>
-            </div>
-          </div>
-
-          <div className="flex-1 flex flex-col relative">
-            <textarea 
-              value={displayText}
-              onChange={handlePasteRaw}
-              placeholder="Paste 500 pre-selected gene expression values (comma or newline separated)&#10;&#10;Or load an example sample using the buttons below..."
-              className="flex-1 min-h-[200px] bg-[#020813]/60 border border-[#3b82f6]/20 rounded-xl p-4 text-xs font-mono text-gray-300 focus:outline-none focus:border-[#FFD700]/50 transition-colors resize-none"
-            />
-            
-            <div className="absolute bottom-4 right-4 flex gap-2 flex-wrap justify-end">
-              {availableExamples.map((sampleName) => {
-                const example = getExampleSample(sampleName);
-                const sampleNum = sampleName.replace('sample_', '#');
-                const isActive = loadedSample === sampleName;
-                return (
-                  <button 
-                    key={sampleName}
-                    onClick={() => handleLoadExample(sampleName)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors flex items-center gap-1.5 ${
-                      isActive 
-                        ? 'bg-[#FFD700]/20 border border-[#FFD700]/50 text-[#FFD700]' 
-                        : 'bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 border border-[#3b82f6]/30 text-[#60a5fa]'
-                    }`}
-                    title={`Load ${sampleName} (${example?.label})`}
-                  >
-                    <Beaker className="w-3 h-3" />
-                    {sampleNum}
-                    <span className="opacity-60 text-[10px]">({example?.label})</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-              className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 font-mono flex items-center gap-2"
-            >
-              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-              {error}
-            </motion.div>
-          )}
-
-          {warning && (
-            <motion.div 
-              initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-              className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-xs text-yellow-500 font-mono flex items-start gap-2"
-            >
-              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <div className="leading-relaxed">{warning}</div>
-            </motion.div>
-          )}
-
-          <button 
-            onClick={handlePredict}
-            disabled={!selectedFeatures || loading}
-            className={`mt-4 w-full py-4 rounded-xl font-bold font-mono text-sm transition-all flex items-center justify-center gap-2 ${
-              !selectedFeatures || loading 
-              ? 'bg-[#0a1526] text-gray-500 cursor-not-allowed border border-white/5'
-              : 'bg-gradient-to-r from-[#3b82f6] to-[#2563eb] hover:to-[#1d4ed8] text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]'
-            }`}
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Running 100 Decision Trees...
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4" fill="currentColor" />
-                Run ML Inference
-              </>
-            )}
-          </button>
+    <div className="panel grid gap-10 p-5 md:p-8 lg:grid-cols-2">
+      {/* Input */}
+      <div className="flex flex-col">
+        <p className="eyebrow mb-2">Patient RNA-Seq input</p>
+        <p className="mb-5 text-sm text-fg-3">Load a TCGA sample, or paste 500 selected / 20,531 raw expression values.</p>
+        <div className="mb-3 flex flex-wrap gap-2">
+          {availableExamples.map((sampleName) => {
+            const label = getExampleSample(sampleName)?.label;
+            const isActive = loadedSample === sampleName;
+            return (
+              <button key={sampleName} onClick={() => handleLoadExample(sampleName)} aria-pressed={isActive}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-xs transition-colors ${isActive ? 'border-accent bg-accent/10 text-accent' : 'border-line-2 text-fg-2 hover:border-fg-3 hover:text-fg'}`}>
+                <Beaker className="h-3 w-3" />{sampleName.replace('sample_', '#')}<span className="text-fg-3">{label}</span>
+              </button>
+            );
+          })}
         </div>
+        <textarea
+          value={displayText} onChange={handlePasteRaw} aria-label="Gene expression values"
+          placeholder={'Paste 500 pre-selected gene expression values (comma or newline separated)\n\nOr load a sample above…'}
+          className="min-h-[220px] flex-1 resize-none rounded-xl border border-line-2 bg-ink/70 p-4 font-mono text-xs leading-relaxed text-fg-2 transition-colors placeholder:text-fg-3 focus:border-accent/60 focus:outline-none"
+        />
+        {error && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} role="alert" className={`${alert} border-red-500/30 bg-red-500/10 text-red-300`}>
+            <AlertTriangle className="h-4 w-4 shrink-0" />{error}
+          </motion.div>
+        )}
+        {warning && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} role="status" className={`${alert} border-accent/30 bg-accent/10 text-accent`}>
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />{warning}
+          </motion.div>
+        )}
+        <motion.button
+          onClick={handlePredict} disabled={!selectedFeatures || loading}
+          whileHover={selectedFeatures && !loading ? { scale: 1.015 } : undefined} whileTap={{ scale: 0.98 }}
+          className="btn-accent mt-4 w-full justify-center py-4 font-mono disabled:cursor-not-allowed disabled:bg-ink-3 disabled:text-fg-3"
+        >
+          {loading
+            ? <><span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />Running 100 decision trees…</>
+            : <><Play className="h-4 w-4" fill="currentColor" />Run ML inference</>}
+        </motion.button>
+      </div>
 
-        {/* Right Side: Results */}
-        <div className="flex flex-col justify-center">
-          <AnimatePresence mode="wait">
-            {!result ? (
-              <motion.div 
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="h-full flex flex-col items-center justify-center text-center p-8 border border-dashed border-white/10 rounded-2xl bg-white/[0.02]"
-              >
-                <Dna className="w-12 h-12 text-gray-600 mb-4" />
-                <p className="text-gray-400 font-mono text-sm">
-                  Awaiting patient profile.<br />Run inference to discover active TF drivers.
-                </p>
-                <p className="text-gray-600 font-mono text-[10px] mt-3">
-                  100 Decision Trees · 500 Genes · 5 Cancer Types
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="results"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
-              >
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-[#0a1526] to-[#020813] border border-[#FFD700]/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-4">
-                    <div className="px-3 py-1 bg-[#FFD700]/10 border border-[#FFD700]/30 rounded-full text-xs font-mono text-[#FFD700]">
-                      {result.confidence}% Confidence
-                    </div>
-                  </div>
-                  <h4 className="text-xs font-mono tracking-widest text-[#60a5fa] mb-1 uppercase">Predicted Subtype</h4>
-                  <div className="flex items-end gap-3 mb-2">
-                    <span 
-                      className="text-4xl font-black"
-                      style={{ color: CANCER_COLORS[result.cancerType] || '#fff' }}
-                    >
-                      {result.cancerType}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-400">{result.cancerName}</p>
-
-                  {/* Probability bar chart */}
-                  <div className="mt-4 space-y-2">
-                    {Object.entries(result.probabilities)
-                      .sort((a, b) => b[1] - a[1])
-                      .map(([cls, prob]) => (
-                        <div key={cls} className="flex items-center gap-3">
-                          <span className="text-[10px] font-mono text-gray-500 w-10">{cls}</span>
-                          <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${prob}%` }}
-                              transition={{ duration: 0.8, ease: 'easeOut' }}
-                              className="h-full rounded-full"
-                              style={{ backgroundColor: CANCER_COLORS[cls] || '#3b82f6' }}
-                            />
-                          </div>
-                          <span className="text-[10px] font-mono text-gray-500 w-12 text-right">{prob}%</span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-xs font-mono tracking-widest text-gray-500 mb-4 uppercase flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FFD700]" />
-                    Hyperactive Driver TFs
-                  </h4>
-                  <div className="space-y-3">
-                    {result.topTFs.map((tf, i) => (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        key={tf.name} 
-                        className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-[#FFD700]/30 hover:bg-[#FFD700]/5 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-[#0a1526] border border-white/10 flex items-center justify-center font-mono text-xs text-[#FFD700] font-bold">
-                            #{i+1}
-                          </div>
-                          <div>
-                            <div className="font-bold font-mono text-sm">{tf.name}</div>
-                            <div className="text-xs text-gray-500">{tf.role}</div>
-                          </div>
-                        </div>
-                        <div className="text-sm font-mono text-[#3b82f6] font-bold">
-                          {tf.level}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-
-                {loadedSample && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-center"
-                  >
-                    <p className="text-[10px] font-mono text-gray-600">
-                      Ground truth: <span className="text-[#FFD700]">{getExampleSample(loadedSample)?.label}</span>
-                      {' · '}
-                      Predicted: <span className={result.cancerType === getExampleSample(loadedSample)?.label ? 'text-green-400' : 'text-red-400'}>
-                        {result.cancerType}
-                      </span>
-                      {' · '}
-                      {result.cancerType === getExampleSample(loadedSample)?.label ? '✓ Correct' : '✗ Mismatch'}
+      {/* Results */}
+      <div className="flex flex-col justify-center" aria-live="polite">
+        <AnimatePresence mode="wait">
+          {!result ? (
+            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-line-2 p-10 text-center">
+              <Dna className="mb-4 h-10 w-10 text-fg-3" />
+              <p className="text-sm text-fg-2">Awaiting a patient profile.</p>
+              <p className="mt-2 font-mono text-[11px] text-fg-3">100 trees · 500 genes · 5 subtypes · runs in your browser</p>
+            </motion.div>
+          ) : (
+            <motion.div key="results" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+              <div className="rounded-2xl border border-line-2 bg-ink-3/60 p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="eyebrow mb-2">Predicted subtype</p>
+                    <p className="flex items-center gap-3 font-display text-5xl font-medium text-fg">
+                      <span className="h-4 w-4 rounded-full" style={{ background: CANCER_COLORS[result.cancerType] }} />{result.cancerType}
                     </p>
-                  </motion.div>
-                )}
-                
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                    <p className="mt-2 text-sm text-fg-3">{result.cancerName}</p>
+                  </div>
+                  <span className="rounded-full border border-accent/40 px-3 py-1 font-mono text-xs text-accent">{result.confidence}%</span>
+                </div>
+                <div className="mt-6 space-y-2">
+                  {Object.entries(result.probabilities).sort((a, b) => b[1] - a[1]).map(([cls, prob]) => (
+                    <div key={cls} className="grid grid-cols-[3rem_1fr_3.5rem] items-center gap-3">
+                      <span className="font-mono text-[11px] text-fg-2">{cls}</span>
+                      <span className="h-1.5 overflow-hidden rounded-full bg-white/5">
+                        <motion.span className="block h-full w-full origin-left rounded-full" style={{ background: CANCER_COLORS[cls] }}
+                          initial={{ transform: 'scaleX(0)' }} animate={{ transform: `scaleX(${prob / 100})` }} transition={{ type: 'spring', bounce: 0, visualDuration: 0.8 }} />
+                      </span>
+                      <span className="text-right font-mono text-[11px] tabular-nums text-fg-3">{prob}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
+              <div>
+                <p className="eyebrow mb-3">Hyperactive driver TFs</p>
+                <div className="space-y-2">
+                  {result.topTFs.map((tf, i) => (
+                    <motion.div key={tf.name} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', bounce: 0, visualDuration: 0.4, delay: 0.1 + i * 0.07 }}
+                      className="flex items-center justify-between rounded-xl border border-line p-3 transition-colors hover:border-line-2 hover:bg-white/[0.03]">
+                      <div className="flex items-center gap-3">
+                        <span className="grid h-8 w-8 place-items-center rounded-lg bg-ink-3 font-mono text-xs text-accent">{i + 1}</span>
+                        <div>
+                          <p className="font-mono text-sm text-fg">{tf.name}</p>
+                          <p className="text-xs text-fg-3">{tf.role}</p>
+                        </div>
+                      </div>
+                      <span className="font-mono text-sm text-fg-2">{tf.level}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {truth && (
+                <p className="text-center font-mono text-[11px] text-fg-3">
+                  Ground truth <span className="text-fg">{truth}</span> · predicted <span className="text-fg">{result.cancerType}</span> ·{' '}
+                  <span className={result.cancerType === truth ? 'text-green-400' : 'text-red-400'}>{result.cancerType === truth ? '✓ correct' : '✗ mismatch'}</span>
+                </p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
