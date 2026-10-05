@@ -107,11 +107,12 @@ function Field({ pointer }) {
   useFrame((_, dt) => {
     const g = group.current, u = uniforms, damp = THREE.MathUtils.damp;
     u.uMorph.value = damp(u.uMorph.value, sceneState.morph, 5, dt);
-    u.uFade.value = damp(u.uFade.value, sceneState.fade, 4, dt);
+    const wide = viewport.aspect > 1.1;
+    // On phones the helix sits behind the intro copy until the story docks it above the text, so keep it quieter there.
+    u.uFade.value = damp(u.uFade.value, sceneState.fade * (wide ? 1 : 0.4 + 0.6 * sceneState.dock), 4, dt);
     u.uScale.value = 62 * gl.getPixelRatio() * (size.height / 900);
     g.visible = u.uFade.value > 0.01;
     if (!reduce) { u.uTime.value += dt; base.current += dt * 0.1; }
-    const wide = viewport.aspect > 1.1;
     const dock = sceneState.dock;
     g.position.x = damp(g.position.x, wide ? viewport.width * 0.2 : viewport.width * 0.52 * (1 - dock), 3, dt);
     g.position.y = damp(g.position.y, wide ? 0 : viewport.height * 0.2 * dock, 3, dt);

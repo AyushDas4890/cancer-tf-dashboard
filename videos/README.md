@@ -16,5 +16,5 @@ node scripts/sync.mjs && node scripts/sfx.mjs && python3 scripts/mix.py
 node scripts/render.mjs --all          # 60 fps finals → renders/16x9.mp4, renders/9x16.mp4
 ```
 
-The site uses web encodes of the 16:9 final in `public/film/`; `exports/` holds the 9:16 social cut.
+The site plays web encodes of both finals from `public/film/` (H.264 MP4 + VP9 WebM, 16:9 and 9:16, plus posters); the 9:16 file doubles as the social cut.
 Docs: `docs/shotlist.md` (approved), `docs/style_guide.md`, `docs/review_log.md` (critique rounds).
