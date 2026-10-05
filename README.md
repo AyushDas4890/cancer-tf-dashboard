@@ -33,7 +33,7 @@ The accompanying web dashboard allows users to interactively explore the dataset
 
 ### Features
 - 🧬 **Scroll-driven 3D story:** a 6,000-particle field morphs on the GPU from a DNA helix → expression matrix → decision space → five subtype clusters as you scroll the pinned *Method* section (GSAP ScrollTrigger).
-- 🎬 **Hero film:** a 20 s beat-synced motion-graphics film rendered in code from the same particle system (`videos/tf-atlas-film`); muted loop in the hero, full film with sound on click.
+- 🎬 **Hero film:** a 20 s beat-synced motion-graphics film rendered in code from the same particle system (`videos/tf-atlas-film`). It is the hero itself: autoplays muted (16:9 or 9:16 by viewport), feathers into the page and dissolves into the live 3D helix as you scroll; one tap for sound.
 - 🌍 **Genome globe:** 801 tumour samples clustered by subtype with the lead TF per lineage (drag to rotate).
 - 📊 **TF ranking + cohort donut:** Motion layout animations, filterable by subtype, colour-blind-validated palette.
 - 🔮 **Patient Predictor:** the full 100-tree Random Forest runs in your browser on a real TCGA sample or your own profile.

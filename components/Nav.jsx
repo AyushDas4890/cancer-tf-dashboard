@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { motion, useMotionValueEvent, useScroll } from 'motion/react';
 import { Play } from 'lucide-react';
-import { useFilm } from '@/components/Providers';
 
 const LINKS = [['method', 'Method'], ['results', 'Results'], ['tfs', 'TFs'], ['atlas', 'Atlas'], ['predictor', 'Predictor']];
 
@@ -10,7 +9,6 @@ export default function Nav() {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState(null);
-  const { setOpen } = useFilm();
 
   useMotionValueEvent(scrollY, 'change', (y) => setHidden(y > 160 && y > scrollY.getPrevious()));
 
@@ -42,10 +40,10 @@ export default function Nav() {
             </li>
           ))}
         </ul>
-        <button onClick={() => setOpen(true)} className="btn-ghost !py-2 !pl-2.5 !pr-4">
+        <a href="#top" className="btn-ghost !py-2 !pl-2.5 !pr-4">
           <span className="grid h-6 w-6 place-items-center rounded-full bg-accent text-accent-ink"><Play className="h-3 w-3" fill="currentColor" /></span>
           Film
-        </button>
+        </a>
       </nav>
     </motion.header>
   );
