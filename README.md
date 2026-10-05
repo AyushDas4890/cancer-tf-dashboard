@@ -17,7 +17,7 @@
 
 This project utilizes the **TCGA Pan-Cancer Atlas** dataset to predict 5 different cancer subtypes based on patient RNA-Seq gene expression profiles. Beyond just classification, the machine learning pipeline extracts **Feature Importance** to independently discover critical Transcription Factors (TFs) that drive each cancer type.
 
-The results are visualized in a **Premium Interactive 3D Dashboard** built with Next.js, Framer Motion, and Three.js. 
+The results are visualized in an **interactive 3D motion-design dashboard** built with Next.js, Three.js (React Three Fiber), GSAP ScrollTrigger and Motion (formerly Framer Motion).
 
 ### Key Highlights
 - **98.76% Classification Accuracy** using an optimized Random Forest model.
@@ -32,13 +32,15 @@ The results are visualized in a **Premium Interactive 3D Dashboard** built with 
 The accompanying web dashboard allows users to interactively explore the dataset, visualize TF importance in 3D, and even input patient RNA-Seq profiles to predict active driver genes.
 
 ### Features
-- 🧬 **Interactive 3D Genome Globe:** Visualizes TF hotspots across cancer types.
-- 🎨 **Premium Aesthetic:** Designed with a stunning Blue & Gold theme (#87 palette) featuring scroll-triggered animations and hover effects.
-- 🔮 **Patient Predictor Tool:** Load an RNA-Seq profile to predict the cancer type and see exactly which genes are hyperactive.
+- 🧬 **Scroll-driven 3D story:** a 6,000-particle field morphs on the GPU from a DNA helix → expression matrix → decision space → five subtype clusters as you scroll the pinned *Method* section (GSAP ScrollTrigger).
+- 🎬 **Hero film:** a 20 s beat-synced motion-graphics film rendered in code from the same particle system (`videos/tf-atlas-film`); muted loop in the hero, full film with sound on click.
+- 🌍 **Genome globe:** 801 tumour samples clustered by subtype with the lead TF per lineage (drag to rotate).
+- 📊 **TF ranking + cohort donut:** Motion layout animations, filterable by subtype, colour-blind-validated palette.
+- 🔮 **Patient Predictor:** the full 100-tree Random Forest runs in your browser on a real TCGA sample or your own profile.
+- ♿ Respects `prefers-reduced-motion` throughout.
 
 > **To run the dashboard locally:**
 > ```bash
-> cd cancer-dashboard
 > npm install
 > npm run dev
 > ```

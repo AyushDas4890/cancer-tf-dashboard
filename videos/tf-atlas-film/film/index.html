@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cancer TF Atlas film</title>
+<style>
+  /* One display face, one UI face. Point these at the brand's real files in assets/fonts/ (capture.mjs lists them). */
+  @font-face { font-family: 'Display'; src: url(../assets/fonts/display.woff2) format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'UI'; src: url(../assets/fonts/ui.woff2) format('woff2'); font-weight: 100 900; }
+  :root {
+    /* style guide tokens: ONE accent unless the brief says otherwise */
+    --bg: #06080B; --ink: #EDEFF2; --ink-2: #A3ACB9; --ink-3: #7C8592; --accent: #F2C14E; --card: #0C0F14;
+  }
+  html, body { margin: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; overflow: hidden; background: var(--bg); transform-origin: 0 0;
+           font-family: 'UI', 'Helvetica Neue', Arial, sans-serif; color: var(--ink);
+           -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+  .scene { position: absolute; inset: 0; overflow: hidden; }
+  .abs { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .display { font-family: 'Display', 'Helvetica Neue', Arial, sans-serif; font-weight: 500; letter-spacing: -0.045em;
+             line-height: 0.95; white-space: nowrap; }
+  /* a line is a mask: words rise through it. Padding keeps descenders; start words >= 140% below so no sliver shows. */
+  .line { position: absolute; overflow: hidden; padding: 0.08em 0.04em 0.18em; margin: -0.08em -0.04em 0; white-space: nowrap; }
+  .word { display: inline-block; }
+  .card { position: absolute; background: var(--card); border-radius: 28px; border: 1px solid #EDEFF229;
+          box-shadow: 0 40px 120px -30px rgba(0,0,0,.8); overflow: hidden; }
+  .ui { font-family: 'UI', ui-monospace, monospace; font-weight: 500; letter-spacing: 0; }
+  .eyebrow { font-family: 'UI', ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-3); white-space: nowrap; }
+  body.play { display: block; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script src="lib/motion.js"></script>
+<script src="data.js"></script>
+<script src="core.js"></script>
+<script src="type.js"></script>
+<script src="film.js"></script>
+</body>
+</html>

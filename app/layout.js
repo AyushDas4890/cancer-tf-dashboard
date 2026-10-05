@@ -1,17 +1,10 @@
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import Providers from '@/components/Providers';
 import './globals.css';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-space',
-  display: 'swap',
-});
+const ui = Inter({ subsets: ['latin'], variable: '--font-ui', display: 'swap' });
+const display = Space_Grotesk({ subsets: ['latin'], variable: '--font-display', display: 'swap' });
+const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
 
 export const metadata = {
   title: 'Cancer TF Discovery Atlas | TCGA Pan-Cancer RNA-Seq',
@@ -25,10 +18,16 @@ export const metadata = {
   },
 };
 
+export const viewport = { themeColor: '#06080B' };
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body className="antialiased">{children}</body>
+    <html lang="en" className={`${ui.variable} ${display.variable} ${mono.variable}`}>
+      <body className="bg-ink font-sans text-fg antialiased">
+        {/* Split-text headlines start hidden to avoid a flash before GSAP splits them */}
+        <noscript><style>{'.reveal{visibility:visible!important}'}</style></noscript>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
